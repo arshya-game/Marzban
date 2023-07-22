@@ -148,4 +148,41 @@
     </script>
 </body>
 
+  }
+
+func getExpiryTime(expiryTime int64) string {
+	now := time.Now().Unix()
+	expiryString := ""
+
+	timeDifference := expiryTime/1000 - now
+
+	if expiryTime == 0 {
+		expiryString = "♾ ⏳"
+	} else if timeDifference > 172800 {
+		expiryString = fmt.Sprintf("%s ⏳", ptime.Unix((expiryTime/1000), 0).Format("yy-MM-dd hh:mm"))
+	} else if expiryTime < 0 {
+		expiryString = fmt.Sprintf("%d ⏳", expiryTime/-86400000)
+	} else {
+		expiryString = fmt.Sprintf("%s %d ⏳", "ساعت", timeDifference/3600)
+	}
+
+	return expiryString
+}
+
+func (s *SubService) getRemainedTraffic(email string) string {
+	traffic, err := s.inboundService.GetClientTrafficByEmail(email)
+	if err != nil {
+		logger.Warning(err)
+	}
+
+	remainedTraffic := ""
+	if traffic.Total == 0 {
+		remainedTraffic = "♾ 📊"
+	} else {
+		remainedTraffic = fmt.Sprintf("%s%s", common.FormatTraffic(traffic.Total-(traffic.Up+traffic.Down)), "📊")
+	}
+
+	return remainedTraffic
+}  
+    
 </html>
